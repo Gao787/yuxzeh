@@ -14,8 +14,9 @@ export async function loadGeoJSON(code: string): Promise<GeoJSONData> {
   const cached = geoCache.get(code)
   if (cached) return cached
 
-  const resp = await fetch(info.file)
-  if (!resp.ok) throw new Error(`加载 GeoJSON 失败: ${info.file}`)
+  const url = import.meta.env.BASE_URL + info.file.replace(/^\//, '')
+  const resp = await fetch(url)
+  if (!resp.ok) throw new Error(`加载 GeoJSON 失败: ${url}`)
   const data: GeoJSONData = await resp.json()
 
   geoCache.set(code, data)
