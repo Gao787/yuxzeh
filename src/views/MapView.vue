@@ -55,12 +55,12 @@ async function syncFromRoute() {
 
     // 重建面包屑路径（往上回溯父级）
     const pathStack: { code: string; name: string; level: any }[] = []
-    let cur: string | undefined = code
-    while (cur && cur !== 'CN') {
-      const g = GEO_REGISTRY[cur]
-      if (!g) break
-      pathStack.unshift({ code: cur, name: g.displayName, level: g.level })
-      cur = g.parentCode
+    let cursor = code
+    while (cursor && cursor !== 'CN') {
+      const geo = GEO_REGISTRY[cursor]
+      if (!geo) break
+      pathStack.unshift({ code: cursor, name: geo.displayName, level: geo.level })
+      cursor = geo.parentCode
     }
 
     // 设置面包屑（最后一项是当前区域，不放面包屑）
