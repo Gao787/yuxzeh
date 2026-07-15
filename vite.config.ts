@@ -16,5 +16,5 @@ export default defineConfig({
     open: true,
   },
   // GitHub Pages 部署
-  base: '/',
+  base: '/yuxzeh/',
 })
