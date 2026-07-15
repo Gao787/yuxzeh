@@ -15,4 +15,6 @@ export default defineConfig({
     port: 5173,
     open: true,
   },
+  // GitHub Pages 部署
+  base: '/',
 })
