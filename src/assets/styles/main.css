@@ -1,0 +1,274 @@
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  background: #f0ece6;
+  color: #333;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #c0b8b0;
+  border-radius: 2px;
+}
+
+/* UnoCSS 补充 */
+.diary-sidebar {
+  width: 360px;
+  min-width: 360px;
+  background: #fafaf8;
+  border-left: 1px solid #e8e4df;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: calc(100vh - 64px - 36px); /* header - breadcrumb */
+}
+
+.map-container {
+  flex: 1;
+  height: calc(100vh - 64px - 36px);
+  position: relative;
+}
+
+.map-3d {
+  width: 100%;
+  height: 100%;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #b0a8a0;
+  gap: 12px;
+}
+
+.empty-state .icon {
+  font-size: 64px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 16px;
+}
+
+.empty-state .sub {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.breadcrumb-bar {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: #f5f3ef;
+  border-bottom: 1px solid #e8e4df;
+  font-size: 13px;
+  color: #666;
+  gap: 4px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.breadcrumb-bar .crumb {
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.breadcrumb-bar .crumb:hover {
+  color: #333;
+}
+
+.breadcrumb-bar .crumb.current {
+  color: #333;
+  font-weight: 600;
+  cursor: default;
+}
+
+.breadcrumb-bar .sep {
+  color: #ccc;
+  margin: 0 2px;
+}
+
+.header-bar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: #fff;
+  border-bottom: 1px solid #e8e4df;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.header-bar .logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: 0.5px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 地图加载中骨架屏 */
+.map-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(240, 236, 230, 0.8);
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+/* 日记卡片 */
+.diary-card {
+  background: #fff;
+  border: 1px solid #e8e4df;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  transition: box-shadow 0.2s;
+}
+
+.diary-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.diary-card .diary-date {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 6px;
+}
+
+.diary-card .diary-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.diary-card .diary-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* 搜索 */
+.search-wrapper {
+  position: relative;
+  width: 280px;
+}
+
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e8e4df;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  margin-top: 4px;
+}
+
+.search-dropdown .search-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-dropdown .search-item:hover {
+  background: #f8f6f2;
+}
+
+.search-dropdown .search-item .region-level {
+  font-size: 11px;
+  color: #999;
+  background: #f0ece6;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* 点亮按钮 */
+.light-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.light-btn.confirm {
+  background: linear-gradient(135deg, #FFB6C1, #FFD1DC);
+  color: #8b4a5c;
+  box-shadow: 0 2px 8px rgba(255, 182, 193, 0.4);
+}
+
+.light-btn.confirm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 182, 193, 0.5);
+}
+
+.light-btn.cancel {
+  background: #f0ece6;
+  color: #888;
+}
+
+.light-btn.cancel:hover {
+  background: #e8e4df;
+  color: #666;
+}
