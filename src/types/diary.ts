@@ -4,6 +4,7 @@ export interface DiaryEntry {
   region_code: string
   region_name: string
   content: string
+  image: string
   created_at: string
   updated_at: string
 }

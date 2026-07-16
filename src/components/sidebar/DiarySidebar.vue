@@ -142,9 +142,9 @@ async function handleUnlight() {
   await lightStore.unlight(selectedCode.value)
 }
 
-async function handleSaveDiary(content: string) {
+async function handleSaveDiary(content: string, image = '') {
   if (!selectedCode.value || !regionDisplayName.value) return
-  await diaryStore.addEntry(selectedCode.value, regionDisplayName.value, content)
+  await diaryStore.addEntry(selectedCode.value, regionDisplayName.value, content, image)
   showEditor.value = false
 }
 

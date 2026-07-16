@@ -34,13 +34,14 @@ export const useDiaryStore = defineStore('diary', () => {
     loading.value = false
   }
 
-  async function addEntry(regionCode: string, regionName: string, content: string) {
+  async function addEntry(regionCode: string, regionName: string, content: string, image = '') {
     if (DEV_MODE) {
       const entry: DiaryEntry = {
         id: Date.now().toString(),
         region_code: regionCode,
         region_name: regionName,
         content,
+        image,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }
@@ -52,7 +53,7 @@ export const useDiaryStore = defineStore('diary', () => {
     if (!authStore.user) return null
     const { data, error } = await supabase
       .from('diaries')
-      .insert({ user_id: authStore.user.id, region_code: regionCode, region_name: regionName, content })
+      .insert({ user_id: authStore.user.id, region_code: regionCode, region_name: regionName, content, image })
       .select().single()
     if (!error && data) { entries.value.unshift(data); return data }
     return null

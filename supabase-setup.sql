@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS diaries (
   region_code TEXT NOT NULL,
   region_name TEXT NOT NULL DEFAULT '',
   content     TEXT NOT NULL DEFAULT '',
+  image       TEXT NOT NULL DEFAULT '',
   created_at  TIMESTAMPTZ DEFAULT NOW(),
   updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
@@ -80,6 +81,7 @@ CREATE TABLE IF NOT EXISTS memories (
   image       TEXT NOT NULL DEFAULT '',
   description TEXT NOT NULL DEFAULT '',
   date        TEXT NOT NULL DEFAULT '',
+  location    TEXT NOT NULL DEFAULT '',
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE memories ENABLE ROW LEVEL SECURITY;

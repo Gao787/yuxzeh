@@ -12,7 +12,8 @@ export interface Memory {
   username: string
   image: string
   description: string
-  date: string        // YYYY-MM-DD
+  date: string
+  location: string
   created_at: string
 }
 
@@ -41,7 +42,7 @@ export const useMemoryStore = defineStore('memory', () => {
     loading.value = false
   }
 
-  async function addMemory(imageBase64: string, description: string, date: string) {
+  async function addMemory(imageBase64: string, description: string, date: string, location: string) {
     const authStore = useAuthStore()
     const username = authStore.user?.username || '我们'
     const userId = authStore.user?.id
@@ -53,6 +54,7 @@ export const useMemoryStore = defineStore('memory', () => {
         image: imageBase64,
         description,
         date: date || new Date().toISOString().slice(0, 10),
+        location,
         created_at: new Date().toISOString(),
       }
       memories.value.unshift(m)
@@ -62,7 +64,7 @@ export const useMemoryStore = defineStore('memory', () => {
 
     const { data, error } = await supabase
       .from('memories')
-      .insert({ user_id: userId, username, image: imageBase64, description, date })
+      .insert({ user_id: userId, username, image: imageBase64, description, date, location })
       .select().single()
     if (!error && data) memories.value.unshift(data)
     return data

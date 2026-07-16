@@ -22,7 +22,9 @@
         style="margin-bottom:10px;"
       />
       <label class="field-label">回忆日期</label>
-      <NDatePicker v-model:value="memDateVal" type="date" style="margin-bottom:14px;" placeholder="选择日期" />
+      <NDatePicker v-model:value="memDateVal" type="date" style="margin-bottom:10px;" placeholder="选择日期" />
+      <label class="field-label">地点</label>
+      <NInput v-model:value="memLocation" placeholder="在哪拍的？" style="margin-bottom:14px;" />
       <NButton type="primary" block :disabled="!previewUrl || !description.trim()" @click="handleAdd">
         保存回忆
       </NButton>
@@ -52,6 +54,7 @@
           <div class="card-body">
             <div class="mem-desc">{{ mem.description }}</div>
             <div class="mem-meta">
+              <span v-if="mem.location" class="mem-loc">{{ mem.location }}</span>
               <span class="mem-date">{{ mem.date || fmtDate(mem.created_at) }}</span>
               <NButton
                 v-if="authStore.isAdmin"
@@ -88,6 +91,7 @@ const previewUrl = ref('')
 const base64Data = ref('')
 const description = ref('')
 const memDateVal = ref<number | null>(null)
+const memLocation = ref('')
 const filterDateVal = ref<number | null>(null)
 const viewImage = ref<string | null>(null)
 
@@ -120,8 +124,8 @@ function handleFile(e: Event) {
 
 async function handleAdd() {
   if (!previewUrl.value || !description.value.trim()) return
-  await memStore.addMemory(base64Data.value, description.value.trim(), toDateStr(memDateVal.value))
-  previewUrl.value = ''; base64Data.value = ''; description.value = ''; memDateVal.value = null
+  await memStore.addMemory(base64Data.value, description.value.trim(), toDateStr(memDateVal.value), memLocation.value.trim())
+  previewUrl.value = ''; base64Data.value = ''; description.value = ''; memDateVal.value = null; memLocation.value = ''
 }
 function canDelete(mem: Memory) {
   return authStore.isAdmin || authStore.user?.username === mem.username

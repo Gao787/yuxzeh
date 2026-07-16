@@ -6,6 +6,7 @@
     <div v-for="entry in entries" :key="entry.id" class="diary-card">
       <div class="diary-date">{{ formatDate(entry.created_at) }}</div>
       <div class="diary-content">{{ entry.content }}</div>
+      <img v-if="entry.image" :src="entry.image" class="diary-img" />
       <div v-if="!readonly" class="diary-actions">
         <NButton text size="tiny" type="primary" @click="$emit('edit', entry)">编辑</NButton>
         <NButton text size="tiny" style="color:#e88;" @click="$emit('delete', entry)">删除</NButton>
@@ -36,10 +37,6 @@ function formatDate(dateStr: string): string {
 .diary-list {
   padding: 8px 16px 16px;
 }
-.empty-hint {
-  text-align: center;
-  color: #bbb;
-  font-size: 13px;
-  padding: 24px 0;
-}
+.diary-img { max-width: 100%; max-height: 160px; border-radius: 8px; margin-top: 8px; }
+.empty-hint { text-align: center; color: #bbb; font-size: 13px; padding: 24px 0; }
 </style>
