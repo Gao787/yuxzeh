@@ -31,11 +31,12 @@ export const useMemoryStore = defineStore('memory', () => {
   async function fetchMemories() {
     if (DEV_MODE) return
     loading.value = true
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('memories')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(50)
+    console.log('[memory] fetch result:', data?.length, 'memories, error:', error)
     memories.value = data || []
     loading.value = false
   }
