@@ -3,6 +3,7 @@
     <div class="header-left">
       <span class="logo">🗺️ Yuxzeh</span>
       <GlobalSearch />
+      <NButton text size="small" @click="router.push('/messages')">💬 祝福留言板</NButton>
     </div>
     <div class="header-right">
       <template v-if="authStore.isLoggedIn">
@@ -20,11 +21,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { NButton } from 'naive-ui'
 import { useAuthStore } from '@/stores/authStore'
 import GlobalSearch from '@/components/search/GlobalSearch.vue'
 import LoginModal from '@/components/auth/LoginModal.vue'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const showLogin = ref(false)
 </script>

@@ -28,67 +28,68 @@ const lightStore = useLightStore()
 const diaryStore = useDiaryStore()
 const authStore = useAuthStore()
 
-/** 根据 URL 参数同步地图层级 */
+/** 根据 URL 加载地图 */
 async function syncFromRoute() {
-  const level = route.params.level as string
-  const code = route.params.regionCode as string
+  const code = (route.params.regionCode as string) || 'CN'
 
-  if (!code || code === 'CN') {
-    // 已是首页：确保回到中国全国（如果 breadcrumb 非空则回退）
-    while (mapStore.breadcrumb.length > 0) {
-      await mapStore.drillUp()
-    }
-    return
-  }
-
-  // 跳转到指定区域（省份或城市）
   const info = GEO_REGISTRY[code]
   if (!info) {
     router.replace('/map/country/CN')
     return
   }
 
+  mapStore.isLoading = true
   try {
-    // 加载目标 GeoJSON 并注册
     const geoJSON = await loadGeoJSON(code)
     registerEChartsMap(info.name, geoJSON)
 
-    // 重建面包屑路径（往上回溯父级）
-    const pathStack: { code: string; name: string; level: any }[] = []
-    let cursor = code
+    // 重建面包屑路径
+    const path: { code: string; name: string; level: any }[] = []
+    let cursor: string | undefined = code
     while (cursor && cursor !== 'CN') {
-      const geo = GEO_REGISTRY[cursor]
-      if (!geo) break
-      pathStack.unshift({ code: cursor, name: geo.displayName, level: geo.level })
-      cursor = geo.parentCode
+      const g = GEO_REGISTRY[cursor]
+      if (!g) break
+      path.unshift({ code: cursor, name: g.displayName, level: g.level })
+      cursor = g.parentCode
     }
 
-    // 设置面包屑（最后一项是当前区域，不放面包屑）
-    const bc = pathStack.slice(0, -1)
-    const self = pathStack[pathStack.length - 1]
-
-    mapStore.setMapState(self.code, info.name, self.level, self.name, geoJSON.features, bc)
-  } catch {
-    console.warn(`无法加载区域: ${code}`)
-    router.replace('/map/country/CN')
-  }
+    if (code === 'CN') {
+      // 回到中国全国
+      mapStore.currentRegionCode = 'CN'
+      mapStore.currentGeoName = info.name
+      mapStore.currentLevel = info.level
+      mapStore.currentDisplayName = info.displayName
+      mapStore.currentFeatures = geoJSON.features
+      mapStore.breadcrumb = []
+    } else {
+      const bc = path.slice(0, -1)
+      const current = path[path.length - 1]
+      if (current) {
+        mapStore.currentRegionCode = current.code
+        mapStore.currentGeoName = info.name
+        mapStore.currentLevel = current.level
+        mapStore.currentDisplayName = current.name
+        mapStore.currentFeatures = geoJSON.features
+        mapStore.breadcrumb = bc
+      }
+    }
+    mapStore.selectRegion(null, null)
+  } catch { /* ignore */ }
+  mapStore.isLoading = false
 }
 
 onMounted(async () => {
   if (authStore.user) {
     await Promise.all([lightStore.fetchFromServer(), diaryStore.fetchFromServer()])
   }
-
   watch(() => authStore.user, async (u) => {
     if (u) await Promise.all([lightStore.fetchFromServer(), diaryStore.fetchFromServer()])
   })
-
   await syncFromRoute()
 })
 
-watch(() => [route.params.level, route.params.regionCode], () => {
-  syncFromRoute()
-})
+// ★ 监听 URL 变化（浏览器前进后退/面包屑点击）
+watch(() => [route.params.level, route.params.regionCode], () => syncFromRoute())
 </script>
 
 <style scoped>

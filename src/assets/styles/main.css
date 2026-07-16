@@ -10,7 +10,7 @@ html, body, #app {
   height: 100%;
   overflow: hidden;
   font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-  background: #f0ece6;
+  background: #ffffff;
   color: #333;
 }
 
@@ -30,8 +30,8 @@ html, body, #app {
 .diary-sidebar {
   width: 360px;
   min-width: 360px;
-  background: #fafaf8;
-  border-left: 1px solid #e8e4df;
+  background: #ffffff;
+  border-left: 1px solid #eee;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -87,8 +87,8 @@ html, body, #app {
   display: flex;
   align-items: center;
   padding: 0 16px;
-  background: #f5f3ef;
-  border-bottom: 1px solid #e8e4df;
+  background: #fafafa;
+  border-bottom: 1px solid #eee;
   font-size: 13px;
   color: #666;
   gap: 4px;
@@ -124,8 +124,8 @@ html, body, #app {
   justify-content: space-between;
   padding: 0 20px;
   background: #fff;
-  border-bottom: 1px solid #e8e4df;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
 
 .header-bar .logo {
@@ -154,7 +154,7 @@ html, body, #app {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(240, 236, 230, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   z-index: 10;
   backdrop-filter: blur(2px);
 }
@@ -232,7 +232,7 @@ html, body, #app {
 .search-dropdown .search-item .region-level {
   font-size: 11px;
   color: #999;
-  background: #f0ece6;
+  background: #ffffff;
   padding: 1px 6px;
   border-radius: 3px;
 }
@@ -264,7 +264,7 @@ html, body, #app {
 }
 
 .light-btn.cancel {
-  background: #f0ece6;
+  background: #ffffff;
   color: #888;
 }
 

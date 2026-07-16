@@ -4,18 +4,32 @@
     <div v-if="!selectedCode" class="empty-state">
       <span class="icon">🗺️</span>
       <p>点击地图上的区域</p>
-      <p class="sub">开始你的探索之旅</p>
+      <p class="sub">我们的探索之旅</p>
     </div>
 
-    <!-- 状态2/3/4：已选中 -->
+    <!-- 已选中 -->
     <template v-else>
+      <!-- ★ 返回上级按钮 -->
+      <div v-if="mapStore.canDrillUp" class="back-section">
+        <NButton text size="small" @click="handleGoBack">
+          ← 返回上级
+        </NButton>
+      </div>
+
       <RegionHeader
         :region-name="regionDisplayName"
         :is-lit="isLit"
         :lit-at="litInfo?.lit_at"
       />
 
-      <!-- 管理员：点亮/取消按钮 -->
+      <!-- ★ 进入按钮：有子级时显示 -->
+      <div v-if="canDrillDown" class="drill-section">
+        <NButton type="primary" block size="medium" @click="handleDrillDown">
+          🔍 进入 {{ regionDisplayName }}
+        </NButton>
+      </div>
+
+      <!-- ★ 点亮/取消按钮 -->
       <LightControl
         v-if="authStore.isAdmin"
         :is-lit="isLit"
@@ -23,14 +37,14 @@
         @unlight="handleUnlight"
       />
 
-      <!-- 已点亮：管理员看日记管理，普通用户看只读 -->
+      <!-- 已点亮：日记管理 -->
       <template v-if="isLit">
         <div class="section-header" style="padding: 8px 16px;">
-          <span>{{ authStore.isAdmin ? '✏️ 旅行日记' : '📝 旅行日记（只读）' }}</span>
+          <span>{{ authStore.isLoggedIn ? '✏️ 旅行日记' : '📝 旅行日记（只读）' }}</span>
         </div>
 
         <NButton
-          v-if="authStore.isAdmin && !showEditor"
+          v-if="authStore.isLoggedIn && !showEditor"
           size="small"
           style="margin: 0 16px 8px;"
           @click="showEditor = true"
@@ -39,22 +53,22 @@
         </NButton>
 
         <DiaryEditor
-          v-if="showEditor && authStore.isAdmin"
+          v-if="showEditor && authStore.isLoggedIn"
           @save="handleSaveDiary"
           @cancel="showEditor = false"
         />
 
         <DiaryList
           :entries="regionDiaries"
-          :readonly="!authStore.isAdmin"
+          :readonly="!authStore.isLoggedIn"
           @delete="handleDeleteDiary"
-          @edit="(entry) => { editingEntry = entry; showEditor = true; editContent = entry.content }"
+          @edit="(entry: DiaryEntry) => { editingEntry = entry; editContent = entry.content; showEditor = true }"
         />
       </template>
     </template>
 
     <!-- 编辑弹窗 -->
-    <NModal v-if="editingEntry" :show="!!editingEntry" @mask-click="editingEntry = null">
+    <NModal :show="!!editingEntry" @mask-click="editingEntry = null">
       <div class="edit-modal">
         <h3>编辑日记</h3>
         <textarea v-model="editContent" rows="6" />
@@ -70,10 +84,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { NButton, NModal } from 'naive-ui'
+import { useRouter } from 'vue-router'
 import { useMapStore } from '@/stores/mapStore'
 import { useLightStore } from '@/stores/lightStore'
 import { useDiaryStore } from '@/stores/diaryStore'
 import { useAuthStore } from '@/stores/authStore'
+import { GEO_REGISTRY } from '@/services/geo-registry'
 import RegionHeader from './RegionHeader.vue'
 import LightControl from './LightControl.vue'
 import DiaryEditor from './DiaryEditor.vue'
@@ -84,6 +100,7 @@ const mapStore = useMapStore()
 const lightStore = useLightStore()
 const diaryStore = useDiaryStore()
 const authStore = useAuthStore()
+const router = useRouter()
 
 const showEditor = ref(false)
 const editingEntry = ref<DiaryEntry | null>(null)
@@ -93,10 +110,36 @@ const selectedCode = computed(() => mapStore.selectedRegionCode)
 const regionDisplayName = computed(() => mapStore.selectedRegionName || '')
 const isLit = computed(() => selectedCode.value ? lightStore.checkLit(selectedCode.value) : false)
 const litInfo = computed(() => selectedCode.value ? lightStore.litRegionMap[selectedCode.value] : null)
+
+// ★ 判断当前选中区域是否有子级（能否下钻）
+const canDrillDown = computed(() => {
+  if (!selectedCode.value) return false
+  const info = GEO_REGISTRY[selectedCode.value]
+  return info?.hasChildren ?? false
+})
+
 const regionDiaries = computed(() => {
   if (!selectedCode.value) return []
   return diaryStore.entries.filter(e => e.region_code === selectedCode.value)
 })
+
+// ★ 返回上级地图
+function handleGoBack() {
+  if (mapStore.breadcrumb.length > 0) {
+    const prev = mapStore.breadcrumb[mapStore.breadcrumb.length - 1]
+    router.push(`/map/${prev.level}/${prev.code}`)
+  } else {
+    router.push('/map/country/CN')
+  }
+}
+
+// ★ 进入下级地图
+function handleDrillDown() {
+  if (!selectedCode.value) return
+  mapStore.drillDown(selectedCode.value)
+  // 同步 URL
+  router.push(`/map/province/${selectedCode.value}`)
+}
 
 async function handleLightUp() {
   if (!selectedCode.value || !regionDisplayName.value) return
@@ -129,6 +172,12 @@ async function handleEditSave() {
 </script>
 
 <style scoped>
+.back-section {
+  padding: 8px 16px 0;
+}
+.drill-section {
+  padding: 12px 16px;
+}
 .edit-modal {
   width: 420px;
   padding: 24px;

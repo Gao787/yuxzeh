@@ -20,6 +20,11 @@ const router = createRouter({
       meta: { guestOnly: true },
     },
     {
+      path: '/messages',
+      name: 'messages',
+      component: () => import('@/views/MessageView.vue'),
+    },
+    {
       path: '/settings',
       name: 'settings',
       component: () => import('@/views/SettingsView.vue'),

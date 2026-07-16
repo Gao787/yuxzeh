@@ -8,39 +8,28 @@ export const useAuthStore = defineStore('auth', () => {
   const session = ref<any>(null)
   const loading = ref(false)
 
-  const isAdmin = computed(() => user.value?.role === 'admin')
-  const isLoggedIn = computed(() => !!user.value)
+  // ★ 开发模式：暂时释放所有权限（后面改回 false）
+  const DEV_MODE = true
 
-  /** 初始化：检查现有 session */
+  const isAdmin = computed(() => DEV_MODE || user.value?.role === 'admin')
+  const isLoggedIn = computed(() => DEV_MODE || !!user.value)
+
   async function init() {
     const { data } = await supabase.auth.getSession()
     if (data.session) {
       session.value = data.session
       await fetchProfile(data.session.user.id)
     }
-
-    // 监听认证状态变化
-    supabase.auth.onAuthStateChange(async (event, newSession) => {
-      session.value = newSession
-      if (newSession) {
-        await fetchProfile(newSession.user.id)
-      } else {
-        user.value = null
-      }
+    supabase.auth.onAuthStateChange(async (_e, s) => {
+      session.value = s
+      if (s) await fetchProfile(s.user.id)
+      else user.value = null
     })
   }
 
-  /** 获取用户 profile */
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-
-    if (data) {
-      user.value = { id: data.id, username: data.username, role: data.role }
-    }
+  async function fetchProfile(uid: string) {
+    const { data } = await supabase.from('profiles').select('*').eq('id', uid).single()
+    if (data) user.value = { id: data.id, username: data.username, role: data.role }
   }
 
   /** 注册 */
@@ -48,32 +37,31 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     const { error, data } = await supabase.auth.signUp({ email, password })
     if (error) { loading.value = false; throw error }
-
-    // 创建 profile
     if (data.user) {
-      await supabase.from('profiles').insert({
-        id: data.user.id,
-        username,
-        role: 'user',
-      })
+      await supabase.from('profiles').insert({ id: data.user.id, username, email, role: 'user' })
       await fetchProfile(data.user.id)
     }
     loading.value = false
   }
 
-  /** 登录 */
-  async function signIn(email: string, password: string) {
+  /** ★ 登录：支持账号名或邮箱 */
+  async function signIn(account: string, password: string) {
     loading.value = true
+    let email = account
+
+    if (!account.includes('@')) {
+      // 用户名登录 → 查 profiles 拿邮箱
+      const { data, error: lookupErr } = await supabase.from('profiles').select('email').eq('username', account).maybeSingle()
+      if (lookupErr || !data?.email) { loading.value = false; throw new Error('账号不存在') }
+      email = data.email
+    }
+
     const { error, data } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { loading.value = false; throw error }
-
-    if (data.user) {
-      await fetchProfile(data.user.id)
-    }
+    if (data.user) await fetchProfile(data.user.id)
     loading.value = false
   }
 
-  /** 登出 */
   async function signOut() {
     await supabase.auth.signOut()
     user.value = null

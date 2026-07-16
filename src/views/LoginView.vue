@@ -4,9 +4,10 @@
       <h2>🗺️ Yuxzeh</h2>
       <p class="subtitle">{{ isLogin ? '登录你的账号' : '创建新账号' }}</p>
 
-      <NInput v-model:value="email" placeholder="邮箱" size="large" style="margin-bottom:12px;" />
-      <NInput v-model:value="password" type="password" placeholder="密码" size="large" style="margin-bottom:12px;" />
-      <NInput v-if="!isLogin" v-model:value="username" placeholder="用户名" size="large" style="margin-bottom:12px;" />
+      <NInput v-model:value="account" placeholder="账号名 / 邮箱" size="large" style="margin-bottom:12px;" />
+      <NInput v-model:value="password" type="password" placeholder="密码" size="large" show-password-toggle style="margin-bottom:12px;" />
+      <NInput v-if="!isLogin" v-model:value="username" placeholder="设置用户名" size="large" style="margin-bottom:6px;" />
+      <NInput v-if="!isLogin" v-model:value="email" placeholder="邮箱" size="large" style="margin-bottom:12px;" />
 
       <NButton type="primary" size="large" block :loading="authStore.loading" @click="handleSubmit">
         {{ isLogin ? '登录' : '注册' }}
@@ -37,6 +38,7 @@ import { useAuthStore } from '@/stores/authStore'
 const router = useRouter()
 const authStore = useAuthStore()
 const isLogin = ref(true)
+const account = ref('')
 const email = ref('')
 const password = ref('')
 const username = ref('')
@@ -46,9 +48,10 @@ async function handleSubmit() {
   error.value = ''
   try {
     if (isLogin.value) {
-      await authStore.signIn(email.value, password.value)
+      await authStore.signIn(account.value, password.value)
     } else {
       if (!username.value) { error.value = '请输入用户名'; return }
+      if (!email.value || !email.value.includes('@')) { error.value = '请输入正确的邮箱'; return }
       await authStore.signUp(email.value, password.value, username.value)
     }
     router.push('/')
