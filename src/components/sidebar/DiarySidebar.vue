@@ -2,7 +2,6 @@
   <aside class="diary-sidebar">
     <!-- 状态1：未选中 -->
     <div v-if="!selectedCode" class="empty-state">
-      <span class="icon">🗺️</span>
       <p>点击地图上的区域</p>
       <p class="sub">我们的探索之旅</p>
     </div>
@@ -40,11 +39,11 @@
       <!-- 已点亮：日记管理 -->
       <template v-if="isLit">
         <div class="section-header" style="padding: 8px 16px;">
-          <span>{{ authStore.isLoggedIn ? '✏️ 旅行日记' : '📝 旅行日记（只读）' }}</span>
+          <span>{{ authStore.isAdmin ? '旅行日记' : '旅行日记（只读）' }}</span>
         </div>
 
         <NButton
-          v-if="authStore.isLoggedIn && !showEditor"
+          v-if="authStore.isAdmin && !showEditor"
           size="small"
           style="margin: 0 16px 8px;"
           @click="showEditor = true"
@@ -53,14 +52,14 @@
         </NButton>
 
         <DiaryEditor
-          v-if="showEditor && authStore.isLoggedIn"
+          v-if="showEditor && authStore.isAdmin"
           @save="handleSaveDiary"
           @cancel="showEditor = false"
         />
 
         <DiaryList
           :entries="regionDiaries"
-          :readonly="!authStore.isLoggedIn"
+          :readonly="!authStore.isAdmin"
           @delete="handleDeleteDiary"
           @edit="(entry: DiaryEntry) => { editingEntry = entry; editContent = entry.content; showEditor = true }"
         />
@@ -84,7 +83,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { NButton, NModal } from 'naive-ui'
-import { useRouter } from 'vue-router'
 import { useMapStore } from '@/stores/mapStore'
 import { useLightStore } from '@/stores/lightStore'
 import { useDiaryStore } from '@/stores/diaryStore'
@@ -100,7 +98,6 @@ const mapStore = useMapStore()
 const lightStore = useLightStore()
 const diaryStore = useDiaryStore()
 const authStore = useAuthStore()
-const router = useRouter()
 
 const showEditor = ref(false)
 const editingEntry = ref<DiaryEntry | null>(null)
@@ -125,20 +122,13 @@ const regionDiaries = computed(() => {
 
 // ★ 返回上级地图
 function handleGoBack() {
-  if (mapStore.breadcrumb.length > 0) {
-    const prev = mapStore.breadcrumb[mapStore.breadcrumb.length - 1]
-    router.push(`/map/${prev.level}/${prev.code}`)
-  } else {
-    router.push('/map/country/CN')
-  }
+  mapStore.drillUp()
 }
 
 // ★ 进入下级地图
 function handleDrillDown() {
   if (!selectedCode.value) return
   mapStore.drillDown(selectedCode.value)
-  // 同步 URL
-  router.push(`/map/province/${selectedCode.value}`)
 }
 
 async function handleLightUp() {

@@ -1,9 +1,11 @@
 <template>
   <header class="header-bar">
     <div class="header-left">
-      <span class="logo">🗺️ Yuxzeh</span>
+      <span class="logo">Yuxzeh</span>
       <GlobalSearch />
-      <NButton text size="small" @click="router.push('/messages')">💬 祝福留言板</NButton>
+      <span class="nav-link" @click="router.push('/')">我们的旅行</span>
+      <span class="nav-link" @click="router.push('/memories')">我们的回忆</span>
+      <span class="nav-link" @click="router.push('/messages')">祝福留言板</span>
     </div>
     <div class="header-right">
       <template v-if="authStore.isLoggedIn">

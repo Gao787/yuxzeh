@@ -2,7 +2,7 @@
   <div class="light-control">
     <template v-if="!isLit">
       <button class="light-btn confirm" @click="$emit('lightUp')">
-        🌟 确认点亮
+        确认点亮
       </button>
       <p class="hint">点亮后可写旅行日记</p>
     </template>

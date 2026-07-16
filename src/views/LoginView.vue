@@ -1,16 +1,19 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h2>🗺️ Yuxzeh</h2>
+      <h2>Yuxzeh</h2>
       <p class="subtitle">{{ isLogin ? '登录你的账号' : '创建新账号' }}</p>
 
-      <NInput v-model:value="account" placeholder="账号名 / 邮箱" size="large" style="margin-bottom:12px;" />
+      <NInput v-model:value="email" placeholder="邮箱" size="large" style="margin-bottom:12px;" />
       <NInput v-model:value="password" type="password" placeholder="密码" size="large" show-password-toggle style="margin-bottom:12px;" />
-      <NInput v-if="!isLogin" v-model:value="username" placeholder="设置用户名" size="large" style="margin-bottom:6px;" />
-      <NInput v-if="!isLogin" v-model:value="email" placeholder="邮箱" size="large" style="margin-bottom:12px;" />
+      <NInput v-if="!isLogin" v-model:value="username" placeholder="设置用户名" size="large" style="margin-bottom:12px;" />
 
       <NButton type="primary" size="large" block :loading="authStore.loading" @click="handleSubmit">
         {{ isLogin ? '登录' : '注册' }}
+      </NButton>
+
+      <NButton text style="margin-top:8px;width:100%;" @click="router.push('/')">
+        先随便看看
       </NButton>
 
       <p v-if="error" style="color:#e74c3c;font-size:13px;margin-top:8px;text-align:center;">{{ error }}</p>
@@ -22,9 +25,6 @@
         </NButton>
       </p>
 
-      <NButton text style="margin-top:8px;width:100%;" @click="router.push('/')">
-        先随便看看
-      </NButton>
     </div>
   </div>
 </template>
@@ -38,7 +38,6 @@ import { useAuthStore } from '@/stores/authStore'
 const router = useRouter()
 const authStore = useAuthStore()
 const isLogin = ref(true)
-const account = ref('')
 const email = ref('')
 const password = ref('')
 const username = ref('')
@@ -48,7 +47,7 @@ async function handleSubmit() {
   error.value = ''
   try {
     if (isLogin.value) {
-      await authStore.signIn(account.value, password.value)
+      await authStore.signIn(email.value, password.value)
     } else {
       if (!username.value) { error.value = '请输入用户名'; return }
       if (!email.value || !email.value.includes('@')) { error.value = '请输入正确的邮箱'; return }
@@ -63,18 +62,17 @@ async function handleSubmit() {
 
 <style scoped>
 .login-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   height: calc(100vh - 64px);
-  background: #f0ece6;
 }
 .login-card {
-  width: 400px;
-  padding: 40px;
-  background: #fff;
+  width: 400px; padding: 40px;
+  background: rgba(255,255,255,.35);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255,255,255,.4);
   border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 32px rgba(0,0,0,.06);
 }
 .login-card h2 {
   text-align: center;

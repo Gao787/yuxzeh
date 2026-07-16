@@ -1,274 +1,224 @@
-/* 全局样式 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ========================================
+   全局样式 — 玻璃磨砂质感
+   ======================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ★ 背景图 + 磨砂底 */
+html, body, #app {
+  width: 100%; height: 100%; overflow: hidden;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  color: #333;
+}
+/* ★ 背景图铺满全屏 */
+#app {
+  background: url('/background.jpg') center / cover no-repeat fixed;
 }
 
-html, body, #app {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
-  background: #ffffff;
-  color: #333;
+/* 玻璃磨砂 mixin 变量 */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-bg-strong: rgba(255, 255, 255, 0.45);
+  --glass-bg-light: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --glass-blur: blur(18px) saturate(160%);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --glass-radius: 14px;
 }
 
 /* 滚动条 */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #c0b8b0;
-  border-radius: 2px;
-}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.5); border-radius: 2px; }
 
-/* UnoCSS 补充 */
-.diary-sidebar {
-  width: 360px;
-  min-width: 360px;
-  background: #ffffff;
-  border-left: 1px solid #eee;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  height: calc(100vh - 64px - 36px); /* header - breadcrumb */
-}
-
-.map-container {
-  flex: 1;
-  height: calc(100vh - 64px - 36px);
-  position: relative;
-}
-
-.map-3d {
-  width: 100%;
-  height: 100%;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #b0a8a0;
-  gap: 12px;
-}
-
-.empty-state .icon {
-  font-size: 64px;
-  opacity: 0.5;
-}
-
-.empty-state p {
-  font-size: 16px;
-}
-
-.empty-state .sub {
-  font-size: 13px;
-  opacity: 0.7;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.breadcrumb-bar {
-  height: 36px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  background: #fafafa;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
-  color: #666;
-  gap: 4px;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-.breadcrumb-bar .crumb {
-  cursor: pointer;
-  color: #888;
-  transition: color 0.2s;
-}
-
-.breadcrumb-bar .crumb:hover {
-  color: #333;
-}
-
-.breadcrumb-bar .crumb.current {
-  color: #333;
-  font-weight: 600;
-  cursor: default;
-}
-
-.breadcrumb-bar .sep {
-  color: #ccc;
-  margin: 0 2px;
-}
-
+/* ========================================
+   Header
+   ======================================== */
 .header-bar {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  height: 64px; display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px;
-  background: #fff;
-  border-bottom: 1px solid #eee;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
 }
+.header-bar .logo { font-size: 20px; font-weight: 900; color: #222; letter-spacing: 1px; font-family: 'SimHei','PingFang SC','Microsoft YaHei',sans-serif; }
+/* 顶栏纯文字导航链接 */
+.nav-link { font-size: 14px; font-weight: 600; color: #555; cursor: pointer; transition: color .2s; }
+.nav-link:hover { color: #B8956C; }
+.header-left { display: flex; align-items: center; gap: 20px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
 
-.header-bar .logo {
-  font-size: 20px;
-  font-weight: 700;
-  color: #333;
-  letter-spacing: 0.5px;
+/* ★ 全局按钮：透明磨砂 + 悬浮放大 */
+.n-button {
+  backdrop-filter: blur(12px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+  background: rgba(255,255,255,.25) !important;
+  border: 1px solid rgba(200,170,120,.4) !important;
+  border-radius: 10px !important;
+  transition: transform .2s, box-shadow .2s !important;
 }
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 24px;
+.n-button:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.n-button--primary-type {
+  background: rgba(255,255,255,.35) !important;
+  color: #6b5030 !important;
 }
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.n-button--primary-type:hover {
+  background: rgba(255,255,255,.45) !important;
+  color: #5a3e20 !important;
 }
+/* text 按钮琥珀色 */
+.n-button--text-type { color: #B8956C !important; }
+.n-button--text-type:hover { color: #8B6040 !important; }
 
-/* 地图加载中骨架屏 */
-.map-loading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.85);
-  z-index: 10;
-  backdrop-filter: blur(2px);
+/* ========================================
+   Breadcrumb
+   ======================================== */
+.breadcrumb-bar {
+  height: 34px; display: flex; align-items: center; padding: 0 16px;
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 13px; color: #666; gap: 4px; overflow-x: auto; white-space: nowrap;
 }
+.breadcrumb-bar .crumb { cursor: pointer; color: #777; transition: color .2s; }
+.breadcrumb-bar .crumb:hover { color: #333; }
+.breadcrumb-bar .crumb.current { color: #333; font-weight: 600; cursor: default; }
+.breadcrumb-bar .sep { color: #bbb; margin: 0 2px; }
 
-/* 日记卡片 */
+/* ========================================
+   Diary Sidebar
+   ======================================== */
+.diary-sidebar {
+  width: 360px; min-width: 360px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--glass-border);
+  display: flex; flex-direction: column; overflow-y: auto;
+  height: calc(100vh - 64px - 34px);
+}
 .diary-card {
-  background: #fff;
-  border: 1px solid #e8e4df;
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-  transition: box-shadow 0.2s;
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+  transition: transform .15s, box-shadow .15s;
+}
+.diary-card:hover { transform: translateY(-1px); box-shadow: var(--glass-shadow); }
+.diary-card .diary-date { font-size: 12px; color: #888; margin-bottom: 6px; }
+.diary-card .diary-content { font-size: 14px; line-height: 1.6; color: #444; white-space: pre-wrap; word-break: break-word; }
+.diary-card .diary-actions { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; }
+
+/* ========================================
+   Map
+   ======================================== */
+.map-container { flex: 1; height: calc(100vh - 64px - 34px); position: relative; background: transparent; }
+.map-glass-panel {
+  position: absolute; inset: 24px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 20px;
+  overflow: hidden;
+  transform: perspective(800px) rotateX(1deg);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.3) inset,
+    0 4px 8px rgba(0,0,0,0.04),
+    0 12px 24px rgba(0,0,0,0.06),
+    0 24px 48px rgba(0,0,0,0.04);
+  transition: transform .3s;
+}
+.map-2d { position: absolute; inset: 0; z-index: 1; }
+.map-2d canvas { background: transparent !important; }
+/* ★ 立体阴影层 */
+.map-shadow { position: absolute; inset: 3px 3px -3px -3px; z-index: 0; }
+.map-shadow canvas { background: transparent !important; opacity: 0.7; }
+.map-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index: 10;
 }
 
-.diary-card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.diary-card .diary-date {
-  font-size: 12px;
-  color: #999;
-  margin-bottom: 6px;
-}
-
-.diary-card .diary-content {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #444;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.diary-card .diary-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
-  font-size: 12px;
-}
-
-/* 搜索 */
-.search-wrapper {
-  position: relative;
-  width: 280px;
-}
-
+/* ========================================
+   Search
+   ======================================== */
+.search-wrapper { position: relative; width: 280px; }
 .search-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border: 1px solid #e8e4df;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  max-height: 300px;
-  overflow-y: auto;
-  z-index: 100;
-  margin-top: 4px;
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: var(--glass-shadow);
+  max-height: 300px; overflow-y: auto; z-index: 100; margin-top: 4px;
 }
-
 .search-dropdown .search-item {
-  padding: 10px 14px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  padding: 10px 14px; cursor: pointer; font-size: 14px; transition: background .15s;
+  display: flex; align-items: center; gap: 8px;
 }
-
-.search-dropdown .search-item:hover {
-  background: #f8f6f2;
-}
-
+.search-dropdown .search-item:hover { background: rgba(255,255,255,.3); }
 .search-dropdown .search-item .region-level {
-  font-size: 11px;
-  color: #999;
-  background: #ffffff;
-  padding: 1px 6px;
-  border-radius: 3px;
+  font-size: 11px; color: #888;
+  background: rgba(255,255,255,.4); padding: 1px 6px; border-radius: 3px;
 }
 
-/* 点亮按钮 */
+/* ========================================
+   Light Buttons
+   ======================================== */
 .light-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 20px; border-radius: 10px; font-size: 14px; font-weight: 500;
+  cursor: pointer; border: none; transition: all .2s;
 }
-
+.light-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 20px; border-radius: 10px; font-size: 14px; font-weight: 500;
+  cursor: pointer; border: none; transition: transform .2s, box-shadow .2s;
+}
 .light-btn.confirm {
-  background: linear-gradient(135deg, #FFB6C1, #FFD1DC);
-  color: #8b4a5c;
-  box-shadow: 0 2px 8px rgba(255, 182, 193, 0.4);
+  background: rgba(200,149,108,0.35);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(200,170,130,.5);
+  color: #6b4a30;
 }
-
-.light-btn.confirm:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 182, 193, 0.5);
-}
-
+.light-btn.confirm:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(0,0,0,.08); }
 .light-btn.cancel {
-  background: #ffffff;
+  background: rgba(255,255,255,.2);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(200,170,130,.4);
   color: #888;
 }
+.light-btn.cancel:hover { transform: scale(1.05); background: rgba(255,255,255,.3); }
 
-.light-btn.cancel:hover {
-  background: #e8e4df;
-  color: #666;
+/* ========================================
+   Empty State
+   ======================================== */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; color: rgba(255,255,255,.7); gap: 12px;
 }
+.empty-state .icon { font-size: 64px; opacity: .5; }
+.empty-state p { font-size: 16px; }
+.empty-state .sub { font-size: 13px; opacity: .7; }
+
+/* ========================================
+   Section Header
+   ======================================== */
+.section-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; font-weight: 600; font-size: 15px;
+}
+
+/* ========================================
+   Glass Modal
+   ======================================== */
+.n-modal {
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+
+/* ========================================
+   Naive UI overrides for glass inputs
+   ======================================== */
+.n-input { background: rgba(255,255,255,.45) !important; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }

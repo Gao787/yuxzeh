@@ -15,12 +15,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useMapStore } from '@/stores/mapStore'
-import { GEO_REGISTRY } from '@/services/geo-registry'
 
 const mapStore = useMapStore()
-const router = useRouter()
 
 const crumbs = computed(() => [
   { code: 'CN', name: '中国' },
@@ -28,16 +25,15 @@ const crumbs = computed(() => [
   { code: mapStore.currentRegionCode, name: mapStore.currentDisplayName },
 ])
 
-function goTo(item: { code: string }) {
-  const info = GEO_REGISTRY[item.code]
-  if (!info) return
-  // 根据层级确定 URL
-  const levelMap: Record<string, string> = {
-    country: 'country',
-    province: 'province',
-    city: 'city',
+async function goTo(item: { code: string }) {
+  if (item.code === 'CN') {
+    // 回到中国全国
+    while (mapStore.breadcrumb.length > 0) {
+      await mapStore.drillUp()
+    }
+  } else {
+    // 回到指定面包屑层级
+    await mapStore.drillUp(item.code)
   }
-  const level = levelMap[info.level] || 'country'
-  router.push(`/map/${level}/${item.code}`)
 }
 </script>

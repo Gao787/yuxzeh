@@ -9,7 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
   const loading = ref(false)
 
   // ★ 开发模式：暂时释放所有权限（后面改回 false）
-  const DEV_MODE = true
+  const DEV_MODE = false
 
   const isAdmin = computed(() => DEV_MODE || user.value?.role === 'admin')
   const isLoggedIn = computed(() => DEV_MODE || !!user.value)
@@ -44,18 +44,9 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = false
   }
 
-  /** ★ 登录：支持账号名或邮箱 */
-  async function signIn(account: string, password: string) {
+  /** 邮箱登录 */
+  async function signIn(email: string, password: string) {
     loading.value = true
-    let email = account
-
-    if (!account.includes('@')) {
-      // 用户名登录 → 查 profiles 拿邮箱
-      const { data, error: lookupErr } = await supabase.from('profiles').select('email').eq('username', account).maybeSingle()
-      if (lookupErr || !data?.email) { loading.value = false; throw new Error('账号不存在') }
-      email = data.email
-    }
-
     const { error, data } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { loading.value = false; throw error }
     if (data.user) await fetchProfile(data.user.id)

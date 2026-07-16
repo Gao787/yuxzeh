@@ -34,9 +34,10 @@ const diaryStore = useDiaryStore()
   margin-bottom: 20px;
 }
 .info-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
+  background: rgba(255,255,255,.3);
+  backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255,255,255,.35);
+  padding: 20px; border-radius: 14px;
   line-height: 2;
 }
 </style>

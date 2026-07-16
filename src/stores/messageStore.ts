@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { supabase } from '@/services/supabase'
 import { useAuthStore } from './authStore'
 
-const DEV_MODE = true
+const DEV_MODE = false
 const MSG_KEY = 'yuxzeh_dev_messages'
 
 export interface Message {

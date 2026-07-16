@@ -4,7 +4,7 @@ import { supabase } from '@/services/supabase'
 import { useAuthStore } from './authStore'
 import type { DiaryEntry } from '@/types/diary'
 
-const DEV_MODE = true
+const DEV_MODE = false
 const DIARY_KEY = 'yuxzeh_dev_diary'
 
 function loadDiary(): DiaryEntry[] {
@@ -29,7 +29,6 @@ export const useDiaryStore = defineStore('diary', () => {
     const { data } = await supabase
       .from('diaries')
       .select('*')
-      .eq('user_id', authStore.user.id)
       .order('created_at', { ascending: false })
     entries.value = data || []
     loading.value = false

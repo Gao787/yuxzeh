@@ -26,10 +26,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { NInput } from 'naive-ui'
-import { useRouter } from 'vue-router'
+import { useMapStore } from '@/stores/mapStore'
 import { PROVINCE_SEARCH_INDEX, type SearchItem } from '@/data/search-index'
 
-const router = useRouter()
+const mapStore = useMapStore()
 const query = ref('')
 const showDropdown = ref(false)
 const results = ref<SearchItem[]>([])
@@ -53,14 +53,10 @@ function handleSearch() {
 function selectItem(item: SearchItem) {
   showDropdown.value = false
   query.value = ''
-  results.value = []
+  results.value = ''
 
   if (item.level === 'province') {
-    // 跳转到该省份
-    router.push(`/map/province/${item.code}`)
-  } else {
-    // 先跳转到省份，再钻取到市 — 简化处理：直接跳父级
-    router.push(`/map/province/${item.code}`)
+    mapStore.drillDown(item.code)
   }
 }
 

@@ -6,7 +6,7 @@ import type { LitRegion, LitRegionMap } from '@/types/light'
 import type { DrillLevel } from '@/types/map'
 
 // ★ 开发模式（跟 authStore 同步，后面一起改成 false）
-const DEV_MODE = true
+const DEV_MODE = false
 
 // ★ 开发模式：从 localStorage 恢复
 const STORAGE_KEY = 'yuxzeh_dev_lit'
@@ -38,7 +38,6 @@ export const useLightStore = defineStore('light', () => {
     const { data } = await supabase
       .from('lit_regions')
       .select('*')
-      .eq('user_id', authStore.user.id)
       .order('lit_at', { ascending: false })
     const map: LitRegionMap = {}
     data?.forEach(r => {

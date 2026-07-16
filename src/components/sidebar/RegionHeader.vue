@@ -1,6 +1,5 @@
 <template>
   <div class="region-header">
-    <div class="region-icon">📍</div>
     <div class="region-info">
       <div class="region-name">{{ regionName }}</div>
       <div class="region-status">

@@ -3,14 +3,16 @@
     <div v-if="mapStore.isLoading" class="map-loading">
       <NSpin size="large" />
     </div>
-    <div ref="chartRef" class="map-3d" />
+    <div class="map-glass-panel">
+      <div ref="shadowRef" class="map-shadow" />
+      <div ref="chartRef" class="map-2d" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import 'echarts-gl'
 import { NSpin } from 'naive-ui'
 import { useMapStore } from '@/stores/mapStore'
 import { useLightStore } from '@/stores/lightStore'
@@ -19,7 +21,9 @@ import { GEO_REGISTRY } from '@/services/geo-registry'
 const mapStore = useMapStore()
 const lightStore = useLightStore()
 const chartRef = ref<HTMLDivElement>()
+const shadowRef = ref<HTMLDivElement>()
 let chart: echarts.ECharts | null = null
+let shadowChart: echarts.ECharts | null = null
 
 function findCode(name: string): string {
   const f = mapStore.currentFeatures.find(f => f.properties.name === name)
@@ -30,11 +34,10 @@ function findCode(name: string): string {
   return name
 }
 
-// ★ 深金色配色方案
-const GOLD_LIT = '#9B6E00'        // 已点亮深金
-const GOLD_SELECTED = '#7A5500'   // 选中+点亮深棕金
-const WARM_WHITE = '#F5F0EB'      // 默认暖白
-const WHITE_SELECTED = '#FFFFFF'   // 选中纯白
+const GOLD_LIT = 'rgba(200,149,108,0.6)'
+const GOLD_SELECTED = 'rgba(160,112,64,0.75)'
+const WARM_WHITE = 'rgba(245,240,234,0.35)'
+const WHITE_SELECTED = 'rgba(255,255,255,0.55)'
 
 const seriesData = computed(() => {
   if (!mapStore.currentFeatures.length) return []
@@ -47,97 +50,84 @@ const seriesData = computed(() => {
     const L = !!litMap[code]
     const S = code === sel
 
-    // regionHeight: 点亮+选中(5) > 选中(4) > 点亮(3) > 默认(1)
-    const regionHeight = L && S ? 5 : S ? 4 : L ? 3 : 1
-
     let areaColor: string
     let borderColor: string
     let borderWidth: number
 
     if (L && S) {
-      areaColor = GOLD_SELECTED; borderColor = '#9A6B0C'; borderWidth = 2
+      areaColor = GOLD_SELECTED; borderColor = 'rgba(139,94,60,0.6)'; borderWidth = 2
     } else if (L) {
-      areaColor = GOLD_LIT; borderColor = '#B8860B'; borderWidth = 1.5
+      areaColor = GOLD_LIT; borderColor = 'rgba(184,149,108,0.5)'; borderWidth = 1.5
     } else if (S) {
-      areaColor = WHITE_SELECTED; borderColor = '#6BAED6'; borderWidth = 2
+      areaColor = WHITE_SELECTED; borderColor = 'rgba(140,180,208,0.6)'; borderWidth = 2
     } else {
-      areaColor = WARM_WHITE; borderColor = '#D0C8C0'; borderWidth = 0.5
+      areaColor = WARM_WHITE; borderColor = 'rgba(216,208,200,0.4)'; borderWidth = 0.5
     }
 
-    return { name, regionHeight, itemStyle: { areaColor, borderColor, borderWidth } }
+    return { name, itemStyle: { areaColor, borderColor, borderWidth } }
   })
 })
 
 const chartOption = computed(() => ({
+  backgroundColor: 'transparent',
+  tooltip: {
+    trigger: 'item',
+    formatter: (p: any) => {
+      const code = findCode(p.name)
+      const lit = lightStore.checkLit(code)
+      return `${p.name}${lit ? ' [已点亮]' : ''}`
+    },
+  },
   series: [{
-    type: 'map3D',
+    type: 'map',
     map: mapStore.currentGeoName,
-    roam: 'move',         // ★ 只允许平移，禁止缩放
-    shading: 'realistic',
-    realisticMaterial: {
-      roughness: 0.7,    // ★ 更粗糙 → 减少反光 → 颜色更显
-      metalness: 0.1,
-    },
-    light: {
-      main: {
-        intensity: 1.5,
-        shadow: true,
-        alpha: 30,
-        beta: 55,
-      },
-      ambient: { intensity: 0.8 },
-    },
-    viewControl: {
-      distance: mapStore.currentLevel === 'country' ? 130 : 90,
-      alpha: 75,
-      beta: 0,
-      center: [0, 0.5, 0],
-      rotateSensitivity: 0.5,
-      zoomSensitivity: 0,          // ★ 禁用滚轮缩放
-      minDistance: 120,            // ★ 锁定距离
-      maxDistance: 140,
-    },
-    groundPlane: {
-      show: true,
-      color: '#ffffff',
-    },
-    regionHeight: 1,
-    // ★ 禁用 ECharts 内置选中（蓝色），由我们自己控制样式
+    roam: false,
     selectedMode: false,
-    itemStyle: {
-      areaColor: WARM_WHITE,
-      borderColor: '#D0C8C0',
-      borderWidth: 0.5,
-    },
-    // ★ hover 浅卡其色，只凸出
-    emphasis: {
-      itemStyle: {
-        areaColor: '#F2ECD8',
-        borderColor: '#C8B89A',
-        borderWidth: 1,
-      },
-      regionHeight: 2,
-      label: {
-        show: true,
-        fontSize: 18,
-        color: '#5C4F3A',
-        fontWeight: 700,
-      },
-    },
     label: {
       show: true,
-      fontSize: mapStore.currentLevel === 'country' ? 13 : 14,
-      color: '#555',
+      fontSize: 12,
+      color: '#777',
       fontWeight: 500,
-      textBorderColor: 'rgba(255,255,255,0.85)',
-      textBorderWidth: 3,
-      distance: 2,
+    },
+    itemStyle: {
+      areaColor: WARM_WHITE,
+      borderColor: 'rgba(216,208,200,0.4)',
+      borderWidth: 0.5,
+    },
+    emphasis: {
+      label: { show: true, fontSize: 16, color: '#444', fontWeight: 700 },
+      itemStyle: { areaColor: 'rgba(255,255,255,0.5)', borderColor: 'rgba(192,184,168,0.6)', borderWidth: 1 },
     },
     data: seriesData.value,
   }],
 }))
 
-// ★ 单击：选中区域（不钻取）
+// ★ 阴影层 option（深色 + 无标签 + offset）
+const shadowOption = computed(() => ({
+  ...chartOption.value,
+  series: [{
+    ...chartOption.value.series![0],
+    label: { show: false },
+    itemStyle: {
+      areaColor: 'rgba(180,170,155,0.45)',
+      borderColor: 'rgba(160,150,135,0.35)',
+      borderWidth: 0.5,
+    },
+    emphasis: {
+      itemStyle: { areaColor: 'rgba(180,170,155,0.5)' },
+    },
+    data: (chartOption.value.series![0] as any).data?.map((d: any) => ({
+      ...d,
+      itemStyle: {
+        ...d.itemStyle,
+        areaColor: d.itemStyle.areaColor === GOLD_SELECTED ? 'rgba(130,90,50,0.6)'
+          : d.itemStyle.areaColor === GOLD_LIT ? 'rgba(160,120,80,0.5)'
+          : 'rgba(180,170,155,0.35)',
+      },
+    })),
+  }],
+}))
+
 function handleClick(params: any) {
   if (!params.name) return
   const code = findCode(params.name)
@@ -145,10 +135,15 @@ function handleClick(params: any) {
 }
 
 function renderChart() {
-  if (!chartRef.value) return
-  // 销毁旧实例
+  if (!chartRef.value || !shadowRef.value) return
   if (chart) { chart.dispose(); chart = null }
-  // 创建新实例
+  if (shadowChart) { shadowChart.dispose(); shadowChart = null }
+
+  // 阴影层（底部）
+  shadowChart = echarts.init(shadowRef.value!)
+  shadowChart.setOption(shadowOption.value as any)
+
+  // 主地图层（顶部）
   chart = echarts.init(chartRef.value!)
   chart.on('click', handleClick)
   chart.setOption(chartOption.value as any)
@@ -157,11 +152,16 @@ function renderChart() {
 onMounted(() => {
   renderChart()
   watch(chartOption, () => renderChart())
-  window.addEventListener('resize', () => chart?.resize())
+  window.addEventListener('resize', () => { chart?.resize(); shadowChart?.resize() })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', () => chart?.resize())
+  window.removeEventListener('resize', () => { chart?.resize(); shadowChart?.resize() })
   chart?.dispose()
+  shadowChart?.dispose()
 })
 </script>
+
+<style scoped>
+.map-2d { width: 100%; height: 100%; }
+</style>
