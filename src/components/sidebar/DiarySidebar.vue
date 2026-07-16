@@ -24,7 +24,7 @@
       <!-- ★ 进入按钮：有子级时显示 -->
       <div v-if="canDrillDown" class="drill-section">
         <NButton type="primary" block size="medium" @click="handleDrillDown">
-          🔍 进入 {{ regionDisplayName }}
+          进入 {{ regionDisplayName }}
         </NButton>
       </div>
 
