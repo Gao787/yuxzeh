@@ -88,10 +88,10 @@ const chartOption = computed(() => ({
       },
     },
     viewControl: {
-      distance: mapStore.currentLevel === 'country' ? 120 : 80,
-      alpha: 25,
+      distance: mapStore.currentLevel === 'country' ? 130 : 90,
+      alpha: 75,  // ★ 接近俯视（90=正上方，75=微微倾斜保留立体感）
       beta: 0,
-      center: [0, 0, 0],
+      center: [0, 0.5, 0],  // 稍微下移让中国居中
       rotateSensitivity: 0.5,
       zoomSensitivity: 1.2,
     },
@@ -112,11 +112,20 @@ const chartOption = computed(() => ({
         borderWidth: 1,
       },
       regionHeight: 2,
+      label: {
+        show: true,
+        fontSize: 18,
+        color: '#333',
+        fontWeight: 700,
+      },
     },
     label: {
       show: true,
-      fontSize: mapStore.currentLevel === 'country' ? 10 : 12,
-      color: '#999',
+      fontSize: mapStore.currentLevel === 'country' ? 13 : 14,
+      color: '#555',
+      fontWeight: 500,
+      textBorderColor: 'rgba(255,255,255,0.8)',
+      textBorderWidth: 3,
       distance: 2,
     },
     data: seriesData.value,
